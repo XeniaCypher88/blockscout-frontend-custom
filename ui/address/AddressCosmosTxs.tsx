@@ -6,7 +6,6 @@ import useIsMounted from 'lib/hooks/useIsMounted';
 import getQueryParamString from 'lib/router/getQueryParamString';
 import ActionBar from 'ui/shared/ActionBar';
 import DataListDisplay from 'ui/shared/DataListDisplay';
-import Pagination from 'ui/shared/pagination/Pagination';
 // import Link from 'toolkit/components/Link/Link';
 
 type CosmosAddressTxItem = {
@@ -50,9 +49,8 @@ const AddressCosmosTxs = ({ shouldRender = true, isQueryEnabled = true }: Props)
   const hash = getQueryParamString(router.query.hash);
 
   const [ data, setData ] = React.useState<CosmosAddressTxResponse | null>(null);
-  const [ isLoading, setIsLoading ] = React.useState(false);
   const [ isError, setIsError ] = React.useState(false);
-  const [ page, setPage ] = React.useState(1);
+  const page = 1;
 
   React.useEffect(() => {
     if (!isQueryEnabled || !hash) {
@@ -63,7 +61,6 @@ const AddressCosmosTxs = ({ shouldRender = true, isQueryEnabled = true }: Props)
 
     async function load() {
       try {
-        setIsLoading(true);
         setIsError(false);
 
         const res = await fetch(
@@ -74,18 +71,14 @@ const AddressCosmosTxs = ({ shouldRender = true, isQueryEnabled = true }: Props)
           throw new Error(`Failed to fetch cosmos txs: ${ res.status }`);
         }
 
-        const json = await res.json();
+        const json = await res.json() as CosmosAddressTxResponse;
 
         if (!ignore) {
           setData(json);
         }
       } catch (_error) {
         if (!ignore) {
-          setIsError(true);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
+          setData(null);
         }
       }
     }
@@ -96,14 +89,6 @@ const AddressCosmosTxs = ({ shouldRender = true, isQueryEnabled = true }: Props)
       ignore = true;
     };
   }, [ hash, isQueryEnabled, page ]);
-
-  const handleNextPageClick = React.useCallback(() => {
-    setPage((prev) => prev + 1);
-  }, []);
-
-  const handlePrevPageClick = React.useCallback(() => {
-    setPage((prev) => Math.max(prev - 1, 1));
-  }, []);
 
   if (!isMounted || !shouldRender) {
     return null;
@@ -116,16 +101,6 @@ const AddressCosmosTxs = ({ shouldRender = true, isQueryEnabled = true }: Props)
       <Text textStyle="sm" color="text.secondary">
         Cosmos transactions
       </Text>
-      <Pagination
-        ml={{ base: 'auto', lg: 8 }}
-        page={ page }
-        pageSize={ PAGE_SIZE }
-        isLoading={ isLoading }
-        hasNextPage={ Boolean(data?.has_next_page) }
-        canGoBack={ page > 1 }
-        onNextPageClick={ handleNextPageClick }
-        onPrevPageClick={ handlePrevPageClick }
-      />
     </ActionBar>
   );
 
