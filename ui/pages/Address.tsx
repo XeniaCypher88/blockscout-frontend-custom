@@ -28,6 +28,7 @@ import AddressAccountHistory from 'ui/address/AddressAccountHistory';
 import AddressBlocksValidated from 'ui/address/AddressBlocksValidated';
 import AddressCoinBalance from 'ui/address/AddressCoinBalance';
 import AddressContract from 'ui/address/AddressContract';
+import AddressCosmosTxs from 'ui/address/AddressCosmosTxs';
 import AddressDeposits from 'ui/address/AddressDeposits';
 import AddressDetails from 'ui/address/AddressDetails';
 import AddressEpochRewards from 'ui/address/AddressEpochRewards';
@@ -270,6 +271,11 @@ const AddressPageContent = () => {
         title: 'Internal txns',
         count: addressTabsCountersQuery.data?.internal_transactions_count,
         component: <AddressInternalTxs shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
+      },
+      {
+        id: 'cosmos_txs',
+        title: 'Cosmos txs',
+        component: <AddressCosmosTxs shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
       },
       addressTabsCountersQuery.data?.celo_election_rewards_count ? {
         id: 'epoch_rewards',
